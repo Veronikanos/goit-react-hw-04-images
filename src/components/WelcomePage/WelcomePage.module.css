@@ -1,0 +1,27 @@
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+p {
+  margin: 0;
+}
+
+.text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #6a82fb;
+}
+
+footer {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 600px;
+  color: rgb(167, 167, 167);
+  padding-top: 20px;
+  text-align: left;
+}
+
+.githubLink {
+  padding: 10px;
+}

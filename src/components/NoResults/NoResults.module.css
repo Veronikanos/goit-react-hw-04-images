@@ -1,0 +1,20 @@
+a {
+  text-decoration: none;
+  cursor: pointer;
+  color: rgb(56, 56, 197);
+}
+
+li::marker {
+  color: #6a82fb;
+}
+
+.wrapper {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.text {
+  font-size: 24px;
+  font-weight: 500;
+  color: #6a82fb;
+}

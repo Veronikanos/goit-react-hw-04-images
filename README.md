@@ -4,7 +4,7 @@ This project was bootstrapped with
 [React homework template](https://github.com/goitacademy/react-homework-template).
 
 You can find live page
-[here](https://veronikanos.github.io/goit-react-hw-04-image-finder/).
+[here](https://veronikanos.github.io/goit-react-hw-04-images/).
 
 This task was accomplished using react hooks and was refactored from class components and lifecycle stages as it was at previous [version](https://github.com/Veronikanos/goit-react-hw-03-image-finder/).
 
@@ -24,7 +24,7 @@ https://user-images.githubusercontent.com/49239848/210173149-d0124bef-ec2d-43c9-
 ### HOW TO RUN THIS PROJECT LOCALLY
 
 Clone this repo:
-`git clone https://github.com/Veronikanos/goit-react-hw-04-image-finder.git`
+`git clone https://github.com/Veronikanos/goit-react-hw-04-images.git`
 
 In the project directory, you can run:
 

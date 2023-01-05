@@ -3,103 +3,95 @@ import { Modal } from './Modal/Modal';
 import { Searchbar } from './Searchbar/Searchbar';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Button } from './Button/Button';
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchGallery } from './service/api';
 import { NoResults } from './NoResults/NoResults';
 import { WelcomePage } from './WelcomePage/WelcomePage';
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useRef } from 'react';
 
-export class App extends Component {
-  state = {
-    query: '',
-    results: [],
-    totalImages: 0,
-    error: null,
-    page: 1,
-    modalImg: null,
-    isLoading: false,
-    isFirstLoading: true,
+export const App = () => {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+  const [totalImages, setTotalImages] = useState(0);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [modalImg, setModalImg] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const isFirstLoading = useRef(true);
+
+  useEffect(() => {
+    const onFetchImage = async () => {
+      setIsLoading(true);
+      try {
+        const { images: result, totalImages: totalImg } = await fetchGallery(
+          query,
+          page
+        );
+        setResults([...results, ...result]);
+        setTotalImages(totalImg);
+      } catch (err) {
+        setError(err.message);
+        console.log(error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    query && onFetchImage();
+    isFirstLoading.current = false;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, page]);
+
+  const startNewQuery = newQuery => {
+    setQuery(newQuery);
+    setPage(1);
+    setResults([]);
+    setTotalImages(0);
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.query !== this.state.query ||
-      prevState.page !== this.state.page
-    ) {
-      this.onFetchImage();
-    }
-    if (this.state.isFirstLoading) {
-      this.setState({ isFirstLoading: false });
-    }
-  }
-
-  onFetchImage = async () => {
-    this.setState({ isLoading: true });
-    try {
-      const { images: result, totalImages } = await fetchGallery(
-        this.state.query,
-        this.state.page
-      );
-      this.setState(prevState => ({
-        results: [...prevState.results, ...result],
-        totalImages,
-      }));
-    } catch (error) {
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ isLoading: false });
-    }
-  };
-
-  onSubmitSearch = newQuery => {
-    if (this.state.query === newQuery) {
+  const onSubmitSearch = newQuery => {
+    if (query === newQuery) {
       toast('The same query, try another one!');
       return;
     }
-    this.setState({ query: newQuery, page: 1, results: [], totalImages: 0 });
+    startNewQuery(newQuery);
   };
 
-  onLoadMoreClick = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
+  const onLoadMoreClick = () => {
+    setPage(page + 1);
   };
 
-  getLargeImageURL = modalData => {
-    this.setState({ modalImg: modalData });
+  const getLargeImageURL = modalData => {
+    setModalImg(modalData);
   };
 
-  closeModal = () => {
-    this.setState({ modalImg: null });
+  const closeModal = () => {
+    setModalImg(null);
   };
 
-  render() {
-    const { isLoading, results, modalImg, isFirstLoading, totalImages, query } =
-      this.state;
-    return (
-      <div>
-        <Searchbar onSubmit={this.onSubmitSearch} />
-        <main>
-          {results.length > 0 && (
-            <ImageGallery result={results} getUrl={this.getLargeImageURL} />
-          )}
+  return (
+    <div>
+      <Searchbar onSubmit={onSubmitSearch} />
+      <main>
+        {results.length > 0 && (
+          <ImageGallery result={results} getUrl={getLargeImageURL} />
+        )}
+        {isFirstLoading.current && <WelcomePage />}
 
-          {isFirstLoading && <WelcomePage />}
+        {!isFirstLoading.current && !results.length && !isLoading && (
+          <NoResults query={query} />
+        )}
+        {isLoading && <Loader />}
+        {totalImages !== results.length && !isLoading && (
+          <Button onClick={onLoadMoreClick} />
+        )}
 
-          {!isFirstLoading && !results.length && !isLoading && (
-            <NoResults query={query} />
-          )}
-          {isLoading && <Loader />}
-          {totalImages !== results.length && !isLoading && (
-            <Button onClick={this.onLoadMoreClick} />
-          )}
-
-          {modalImg && <Modal largeImg={modalImg} onClose={this.closeModal} />}
-          <ToastContainer autoClose={3000} />
-        </main>
-      </div>
-    );
-  }
-}
+        {modalImg && <Modal largeImg={modalImg} onClose={closeModal} />}
+        <ToastContainer autoClose={3000} />
+      </main>
+    </div>
+  );
+};
